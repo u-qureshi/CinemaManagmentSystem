@@ -10,113 +10,12 @@ import java.sql.SQLException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import cinema.MovieOperations;
 
 public class MovieManagment extends JFrame {
 
-private List<Movie> fetchMovies(JComboBox<String> cbmovies) {
-    List<Movie> movies = new ArrayList<>();
-
-    String url = "jdbc:mysql://localhost:3306/cinema";
-    String user = "root";
-    String dbPassword = "admin";
-
-    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
-        String query = "SELECT * FROM movies";
-        PreparedStatement statement = connection.prepareStatement(query);
-        ResultSet resultSet = statement.executeQuery();
-        cbmovies.removeAllItems();
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String title = resultSet.getString("title");
-            String genre = resultSet.getString("genre");
-            String director = resultSet.getString("director");
-            String duration = resultSet.getString("duration");
-            String year = resultSet.getString("year");
-            Movie movie = new Movie(id, title, genre, director, year, duration);
-            movies.add(movie);
-            cbmovies.addItem(title);
-        }
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-
-    return movies;
-}
-
-
-private Movie fetchMovie(String title){
-
-    String url = "jdbc:mysql://localhost:3306/cinema";
-    String user = "root";
-    String dbPassword = "admin";
-    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
-        String query = "SELECT * FROM movies WHERE title = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, title);
-        ResultSet resultSet = statement.executeQuery();
-       
-        if (resultSet.next()){
-         int id = resultSet.getInt("id");
-        String movie_title = resultSet.getString("title");
-        String genre = resultSet.getString("genre");
-        String director = resultSet.getString("director");
-        String year = resultSet.getString("year");
-        String duration = resultSet.getString("duration");
-         
-        Movie movie = new Movie(id, movie_title, genre, director, year, duration);
-        return movie;
-        }
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return null;
-    }
-
-private boolean addMovie(Movie movie) {
-    String url = "jdbc:mysql://localhost:3306/cinema";
-    String user = "root";
-    String dbPassword = "admin";
-
-    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
-        String query = "INSERT INTO movies (title, genre, director, duration, year) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, movie.getTitle());
-        statement.setString(2, movie.getGenre());
-        statement.setString(3, movie.getDirector());
-        statement.setString(4, movie.getDuration());
-        statement.setString(5, movie.getYear());
-        
-
-        int rowsAffected = statement.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
-
-private boolean deleteMovie(int movieId) {
-    String url = "jdbc:mysql://localhost:3306/cinema";
-    String user = "root";
-    String dbPassword = "admin";
-
-    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
-        String query = "DELETE FROM movies WHERE id = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, movieId);
-
-        int rowsAffected = statement.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
-
-
     public MovieManagment() {
+        MovieOperations mop = new MovieOperations();
         setTitle("Movie Management");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 600, 400);
@@ -155,16 +54,17 @@ private boolean deleteMovie(int movieId) {
         String duration = txtduration.getText();
         
         Movie movie = new Movie(1,title, genre, director,year, duration );
-            addMovie(movie);
+            mop.addMovie(movie);
             JOptionPane.showMessageDialog(null, "Movie Added");
-            fetchMovies(cbmovies);
+            
+            mop.fetchMovies(cbmovies);
           txtMovieName.setText("");
         txtReleaseDate.setText("");
         txtgenre.setText("");
         txtdirector.setText("");
         txtduration.setText("");
         });
-        fetchMovies(cbmovies);
+        mop.fetchMovies(cbmovies);
         
         
 
@@ -172,18 +72,17 @@ private boolean deleteMovie(int movieId) {
         btnEditMovie.addActionListener(e -> {
         
         dispose();
-        new editMovie(fetchMovie(cbmovies.getSelectedItem().toString())).setVisible(true);
+        new editMovie(mop.fetchMovie(cbmovies.getSelectedItem().toString())).setVisible(true);
         
         });
 
         JButton btnDeleteMovie = new JButton("Delete Movie");
         btnDeleteMovie.addActionListener(e -> {
-        deleteMovie(fetchMovie(cbmovies.getSelectedItem().toString()).getId());
+        mop.deleteMovie(mop.fetchMovie(cbmovies.getSelectedItem().toString()).getId());
         JOptionPane.showMessageDialog(null, "Movie Deleted");
-        fetchMovies(cbmovies);
+        mop.fetchMovies(cbmovies);
         
         });
-        // Add action listener for the delete movie button
 
         JButton btnBackToAdmin = new JButton("Back to Admin");
         btnBackToAdmin.addActionListener(e -> {
@@ -191,7 +90,6 @@ private boolean deleteMovie(int movieId) {
             new Admin().setVisible(true);
         });
         add(btnBackToAdmin);
-        // Add action listener for the back to admin button as shown before
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

@@ -10,61 +10,14 @@ import java.sql.SQLException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import cinema.MovieOperations;
 
 public class editMovie extends JFrame {
 private Movie movie;
 
-private boolean updateMovie(Movie movie) {
-    String url = "jdbc:mysql://localhost:3306/cinema";
-    String user = "root";
-    String dbPassword = "admin";
-
-    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
-        String query = "UPDATE movies SET title = ?, genre = ?, director = ?, duration = ?, year = ? WHERE id = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, movie.getTitle());
-        statement.setString(2, movie.getGenre());
-        statement.setString(3, movie.getDirector());
-        statement.setString(4, movie.getDuration());
-        statement.setString(5, movie.getYear());
-        statement.setInt(6, movie.getId());
-
-        int rowsAffected = statement.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
-
-private int fetchMovieId(String title){
-
-    String url = "jdbc:mysql://localhost:3306/cinema";
-    String user = "root";
-    String dbPassword = "admin";
-    int id=0;
-    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
-        String query = "SELECT * FROM movies WHERE title = ?";
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, title);
-        ResultSet resultSet = statement.executeQuery();
-        
-        if (resultSet.next()){
-         id = resultSet.getInt("id");
-        
-        }
-        else{
-        id= 0;
-                }
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return id;
-    }
-
     public editMovie(Movie movie) {
         this.movie = movie;
+        MovieOperations mop = new MovieOperations();
         setTitle("Edit Movie");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 600, 400);
@@ -104,7 +57,7 @@ private int fetchMovieId(String title){
         String genre = txtgenre.getText();
         String director = txtdirector.getText();
         String duration = txtduration.getText();
-        int id = fetchMovieId(title);
+        int id = mop.fetchMovieId(title);
         
         movie.setDirector(director);
         movie.setDuration(duration);
@@ -112,7 +65,7 @@ private int fetchMovieId(String title){
         movie.setTitle(title);
         movie.setYear(year);
         movie.setId(id);
-        updateMovie(movie);
+        mop.updateMovie(movie);
         dispose();
         new MovieManagment().setVisible(true);
         });

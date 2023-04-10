@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class Registration extends JFrame {
     
-    private static boolean registerUser(String username, String password, String accountType) {
+    private static boolean registerUser(Customer customer) {
     String url = "jdbc:mysql://localhost:3306/cinema";
     String user = "root";
     String dbPassword = "admin";
@@ -17,9 +17,9 @@ public class Registration extends JFrame {
     try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
         String query = "INSERT INTO users (username, password, account_type) VALUES (?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, username);
-        statement.setString(2, password);
-        statement.setString(3, accountType);
+        statement.setString(1, customer.getUsername());
+        statement.setString(2, customer.getPassword());
+        statement.setString(3, customer.getAccountType());
         
         int rowsAffected = statement.executeUpdate();
         return rowsAffected > 0;
@@ -48,9 +48,10 @@ public class Registration extends JFrame {
         btnRegister.addActionListener(e -> {
             String username = txtUsername.getText();
             String password = txtPassword.getText();
-            String accountType = "customer"; // Or "admin", depending on the selected option
+            String accountType = "customer";
+            Customer customer = new Customer(1, username, password);
 
-            if (registerUser(username, password, accountType)) {
+            if (registerUser(customer)) {
                 JOptionPane.showMessageDialog(null, "Registration successful.");
             } else {
                 JOptionPane.showMessageDialog(null, "Registration failed.");
