@@ -13,7 +13,14 @@ import cinema.MovieOperations;
 
 public class Booking extends JFrame implements TicketOperations {
     private int user_id;
- 
+    public static boolean isNumber(String str) {
+       try {
+           Double.parseDouble(str);
+           return true;
+       } catch (NumberFormatException e) {
+           return false;
+       }
+   }
     @Override
     public boolean bookTicket(TicketBooking booking) {
         String url = "jdbc:mysql://localhost:3306/cinema";
@@ -78,9 +85,14 @@ public class Booking extends JFrame implements TicketOperations {
         JButton btnBook = new JButton("Book");
         btnBook.addActionListener(e -> {
             try{
+                if(txtSeats.getText() == null || isNumber(txtSeats.getText()) != true){
+                JOptionPane.showMessageDialog(null, "Please Choose a valid number for seats");
+                }
+                else{
                 int seats = Integer.parseInt(txtSeats.getText());
                 int current_user_id = user_id; 
-                int show_time =  mop.fetchShowTimeId(cbtimes.getSelectedItem().toString());
+                if(cbtimes.getSelectedItem() != null){
+                     int show_time =  mop.fetchShowTimeId(cbtimes.getSelectedItem().toString());
                 TicketBooking book = new TicketBooking(1,show_time, seats, current_user_id );
                 boolean is_booked= bookTicket(book);
                 if(is_booked){
@@ -89,6 +101,11 @@ public class Booking extends JFrame implements TicketOperations {
                 else{
                     JOptionPane.showMessageDialog(null, "Can not book this movie, May be you already have booked");
                 }
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Showtimes for this movie are not available yet. Or maybe you did not select the showtime");
+                }}
+               
             }
             catch (Exception excep){
             System.out.println(excep);

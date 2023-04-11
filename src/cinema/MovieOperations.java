@@ -216,4 +216,26 @@ public class MovieOperations {
 
     return showtimes;
 }
+    
+    public boolean createShowtime(Showtime st){
+        
+    String url = "jdbc:mysql://localhost:3306/cinema";
+    String user = "root";
+    String dbPassword = "admin";
+
+    try (Connection connection = DriverManager.getConnection(url, user, dbPassword)) {
+        String query = "INSERT INTO showtimes (start_time, end_time, movie_id) VALUES (?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, st.getStartTime());
+        statement.setString(2, st.getEndTime());
+        statement.setInt(3, st.getMovie());
+        
+
+        int rowsAffected = statement.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+    }
 }

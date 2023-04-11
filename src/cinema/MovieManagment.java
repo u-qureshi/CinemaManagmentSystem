@@ -66,7 +66,12 @@ public class MovieManagment extends JFrame {
         });
         mop.fetchMovies(cbmovies);
         
+        JButton btnAddShowTime = new JButton("Add Show time");
+        btnAddShowTime.addActionListener(e -> {
         
+        dispose();
+        new CreateShowtime(mop.fetchMovie(cbmovies.getSelectedItem().toString())).setVisible(true);
+        });
 
         JButton btnEditMovie = new JButton("Edit Movie");
         btnEditMovie.addActionListener(e -> {
@@ -117,6 +122,7 @@ public class MovieManagment extends JFrame {
                     .addComponent(cbmovies)
 
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAddShowTime)
                         .addComponent(btnEditMovie)
                         .addComponent(btnDeleteMovie))
                     .addComponent(btnBackToAdmin))
@@ -152,7 +158,8 @@ public class MovieManagment extends JFrame {
                 )
 
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnEditMovie)
+                    .addComponent(btnAddShowTime)
+                        .addComponent(btnEditMovie)
                     .addComponent(btnDeleteMovie))
                 .addComponent(btnBackToAdmin)
         );
@@ -172,6 +179,7 @@ public class MovieManagment extends JFrame {
         lblmovietitle.setFont(font);
         cbmovies.setFont(font);
         btnEditMovie.setFont(font);
+        btnAddShowTime.setFont(font);
         btnDeleteMovie.setFont(font);
         btnBackToAdmin.setFont(font);
         
